@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RecruitIQ - HR Resume Screener</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--surface:#111118;--card:#16161f;--border:#2a2a3a;--accent:#6c63ff;--accent2:#ff6584;--accent3:#43e97b;--text:#e8e8f0;--muted:#6b6b8a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.92);backdrop-filter:blur(10px);}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;}
+.brand span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tag{font-size:0.7rem;background:rgba(108,99,255,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;border:1px solid rgba(108,99,255,0.3);}
+.hero{text-align:center;padding:72px 48px 48px;}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:#fff;margin-bottom:14px;line-height:1.1;}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{color:var(--muted);font-size:1rem;max-width:500px;margin:0 auto 36px;line-height:1.7;}
+.stats{display:flex;justify-content:center;gap:48px;margin-bottom:56px;}
+.stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);}
+.stat-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.main{max-width:1000px;margin:0 auto;padding:0 48px 80px;}
+.slabel{font-size:0.68rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:14px;font-family:'Syne',sans-serif;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin-bottom:6px;}
+.card-sub{color:var(--muted);font-size:0.85rem;margin-bottom:22px;}
+
+/* Category filter tabs */
+.cat-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+.cat-tab{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.cat-tab:hover,.cat-tab.active{background:rgba(108,99,255,0.15);border-color:var(--accent);color:var(--accent);}
+
+/* Search */
+.search-box{position:relative;margin-bottom:16px;}
+.search-box input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 16px 11px 38px;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;}
+.search-box input:focus{border-color:var(--accent);}
+.search-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;}
+
+/* Selected count bar */
+.sel-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.sel-count{font-size:0.85rem;color:var(--muted);}
+.sel-count strong{color:var(--accent);font-family:'Syne',sans-serif;}
+.btn-clear{background:none;border:none;color:var(--muted);font-size:0.78rem;cursor:pointer;text-decoration:underline;}
+.btn-clear:hover{color:var(--accent2);}
+
+/* Skills list with category headings - all visible together */
+.skills-scroll{max-height:420px;overflow-y:auto;padding-right:6px;}
+.skills-scroll::-webkit-scrollbar{width:4px;}
+.skills-scroll::-webkit-scrollbar-track{background:var(--surface);border-radius:4px;}
+.skills-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.cat-section{margin-bottom:20px;}
+.cat-section.hidden{display:none;}
+.cat-heading{font-size:0.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;font-weight:600;}
+.chips-row{display:flex;flex-wrap:wrap;gap:7px;}
+.skill-chip{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:0.8rem;cursor:pointer;transition:all 0.15s;user-select:none;color:var(--text);}
+.skill-chip:hover{border-color:var(--accent);color:var(--accent);}
+.skill-chip.selected{background:rgba(108,99,255,0.18);border-color:var(--accent);color:var(--accent);}
+.skill-chip.hidden{display:none;}
+
+/* Upload */
+.drop-zone{border:2px dashed var(--border);border-radius:14px;padding:44px;text-align:center;cursor:pointer;transition:all 0.25s;position:relative;}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(108,99,255,0.04);}
+.drop-icon{font-size:2.2rem;margin-bottom:10px;}
+.drop-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:5px;}
+.drop-sub{color:var(--muted);font-size:0.82rem;}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.file-list{margin-top:14px;display:flex;flex-wrap:wrap;gap:7px;}
+.file-pill{background:rgba(67,233,123,0.1);border:1px solid rgba(67,233,123,0.3);color:var(--accent3);border-radius:8px;padding:5px 11px;font-size:0.78rem;}
+.btn-screen{width:100%;margin-top:22px;padding:15px;background:linear-gradient(135deg,var(--accent),#8b7cf6);border:none;border-radius:12px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s;}
+.btn-screen:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(108,99,255,0.35);}
+.btn-screen:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+footer{text-align:center;padding:28px;border-top:1px solid var(--border);color:var(--muted);font-size:0.8rem;}
+footer strong{color:var(--text);}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">Recruit<span>IQ</span></div>
+  <span class="tag">HR Resume Screener</span>
+</nav>
+<div class="hero">
+  <h1>Screen Smarter,<br>Hire <em>Better</em></h1>
+  <p>Upload up to 10 resumes at once. Filter by skills. Detect AI-generated content. Get instant ranked results.</p>
+  <div class="stats">
+    <div><div class="stat-num">10x</div><div class="stat-label">Faster Screening</div></div>
+    <div><div class="stat-num">100+</div><div class="stat-label">Skills in Database</div></div>
+    <div><div class="stat-num">AI</div><div class="stat-label">Fraud Detection</div></div>
+  </div>
+</div>
+<div class="main">
+  <form action="/screen" method="post" enctype="multipart/form-data">
+    <div class="card">
+      <div class="slabel">Step 1 - Filter Skills</div>
+      <div class="card-title">Select Required Skills</div>
+      <div class="card-sub">Choose the skills you want candidates to have. Leave empty to rank all candidates by breadth.</div>
+
+      <!-- Category filter tabs -->
+      <div class="cat-tabs" id="catTabs">
+        <button type="button" class="cat-tab active" data-cat="all">All Skills</button>
+        <th:block th:each="cat : ${categories}">
+          <button type="button" class="cat-tab" th:data-cat="${cat.key}" th:text="${cat.key}"></button>
+        </th:block>
+      </div>
+
+      <!-- Search -->
+      <div class="search-box">
+        <span class="search-ico">&#128269;</span>
+        <input type="text" id="skillSearch" placeholder="Search skills...">
+      </div>
+
+      <!-- Selected count -->
+      <div class="sel-bar">
+        <span class="sel-count"><strong id="selCount">0</strong> skills selected</span>
+        <button type="button" class="btn-clear" onclick="clearAll()">Clear all</button>
+      </div>
+
+      <!-- Skills grouped by category with headings — all visible together -->
+      <div class="skills-scroll" id="skillsScroll">
+        <th:block th:each="cat : ${categories}">
+          <div class="cat-section" th:data-cat="${cat.key}">
+            <div class="cat-heading" th:text="${cat.key}"></div>
+            <div class="chips-row">
+              <th:block th:each="skill : ${cat.value}">
+                <div class="skill-chip" th:data-skill="${skill}" th:data-cat="${cat.key}" th:text="${skill}"></div>
+              </th:block>
+            </div>
+          </div>
+        </th:block>
+      </div>
+
+      <div id="hiddenSkills"></div>
+    </div>
+
+    <!-- Upload -->
+    <div class="card">
+      <div class="slabel">Step 2 - Upload Resumes</div>
+      <div class="card-title">Upload PDF Resumes</div>
+      <div class="card-sub">Up to 10 PDF files, max 50MB each.</div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" name="resumes" id="fileInput" multiple="multiple" accept=".pdf" onchange="handleFiles(this.files)">
+        <div class="drop-icon">&#128196;</div>
+        <div class="drop-title">Drop resumes here or click to browse</div>
+        <div class="drop-sub">PDF files only</div>
+      </div>
+      <div class="file-list" id="fileList"></div>
+      <button type="submit" class="btn-screen" id="screenBtn" disabled="disabled">Screen All Resumes</button>
+    </div>
+  </form>
+</div>
+<footer><strong>RecruitIQ</strong> - HR Resume Screener - RecruitIQ Technologies Pvt. Ltd.</footer>
+<script>
+var sel = {};
+
+// Search — hides individual chips
+document.getElementById('skillSearch').addEventListener('input', function() {
+  var q = this.value.toLowerCase();
+  var chips = document.querySelectorAll('.skill-chip');
+  for (var i = 0; i < chips.length; i++) {
+    var c = chips[i];
+    if (c.getAttribute('data-skill').toLowerCase().indexOf(q) >= 0) {
+      c.classList.remove('hidden');
+    } else {
+      c.classList.add('hidden');
+    }
+  }
+});
+
+// Category tabs — shows/hides whole sections
+var tabs = document.querySelectorAll('.cat-tab');
+for (var t = 0; t < tabs.length; t++) {
+  tabs[t].addEventListener('click', function() {
+    for (var x = 0; x < tabs.length; x++) tabs[x].classList.remove('active');
+    this.classList.add('active');
+    var cat = this.getAttribute('data-cat');
+    var sections = document.querySelectorAll('.cat-section');
+    for (var i = 0; i < sections.length; i++) {
+      var s = sections[i];
+      if (cat === 'all' || s.getAttribute('data-cat') === cat) {
+        s.classList.remove('hidden');
+      } else {
+        s.classList.add('hidden');
+      }
+    }
+    // clear search when switching tab
+    document.getElementById('skillSearch').value = '';
+    var chips = document.querySelectorAll('.skill-chip');
+    for (var j = 0; j < chips.length; j++) chips[j].classList.remove('hidden');
+  });
+}
+
+// Chip click
+var chips = document.querySelectorAll('.skill-chip');
+for (var i = 0; i < chips.length; i++) {
+  chips[i].addEventListener('click', function() {
+    var sk = this.getAttribute('data-skill');
+    if (sel[sk]) {
+      delete sel[sk];
+      this.classList.remove('selected');
+    } else {
+      sel[sk] = true;
+      this.classList.add('selected');
+    }
+    updateHidden();
+  });
+}
+
+function updateHidden() {
+  var c = document.getElementById('hiddenSkills');
+  c.innerHTML = '';
+  var count = 0;
+  for (var sk in sel) {
+    var inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.name = 'skills';
+    inp.value = sk;
+    c.appendChild(inp);
+    count++;
+  }
+  document.getElementById('selCount').textContent = count;
+}
+
+function clearAll() {
+  sel = {};
+  var chips = document.querySelectorAll('.skill-chip.selected');
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('selected');
+  updateHidden();
+}
+
+function handleFiles(files) {
+  var list = document.getElementById('fileList');
+  list.innerHTML = '';
+  var max = Math.min(files.length, 10);
+  for (var i = 0; i < max; i++) {
+    var p = document.createElement('div');
+    p.className = 'file-pill';
+    p.textContent = 'PDF: ' + files[i].name;
+    list.appendChild(p);
+  }
+  document.getElementById('screenBtn').disabled = (files.length === 0);
+}
+
+var dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
+dz.addEventListener('drop', function(e) { e.preventDefault(); dz.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+</script>
+</body>
+</html>

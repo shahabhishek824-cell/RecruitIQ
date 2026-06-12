@@ -1,0 +1,6 @@
+com\recruitiq\model\CandidateResult.class
+com\recruitiq\RecruitIQApplication.class
+com\recruitiq\controller\ResumeController$1.class
+com\recruitiq\controller\ResumeController.class
+com\recruitiq\service\SkillDatabase.class
+com\recruitiq\service\ResumeAnalyzerService.class
