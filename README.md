@@ -1,4 +1,4 @@
-# RecruiterIQ
+# RecruitIQ
 
 RecruitIQ is a resume screening and candidate ranking web application developed using Java and Spring Boot. The system enables recruiters to upload multiple PDF resumes, extract candidate information, identify relevant skills, and rank candidates based on job requirements.
 
