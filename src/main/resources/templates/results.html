@@ -75,6 +75,12 @@ footer strong{color:var(--text);}
   <p th:if="${not #lists.isEmpty(requiredSkills)}" th:text="'Required skills: ' + ${#strings.listJoin(requiredSkills, ', ')}"></p>
   <p th:if="${#lists.isEmpty(requiredSkills)}">No filter applied. Candidates ranked by skill breadth.</p>
 </div>
+<div th:if="${not #lists.isEmpty(errors)}" style="background:#fdecea; color:#611a15; padding:12px; border-radius:6px; margin-bottom:16px;">
+    <strong>Some files were skipped:</strong>
+    <ul>
+        <li th:each="err : ${errors}" th:text="${err}"></li>
+    </ul>
+</div>
 <div class="grid">
   <div th:if="${#lists.isEmpty(results)}" style="text-align:center;padding:60px;color:var(--muted);">
     <h3 style="color:var(--text);margin-bottom:8px;">No results found</h3>
